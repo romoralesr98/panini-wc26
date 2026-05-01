@@ -1,5 +1,5 @@
-// Cambia este número cada vez que publiques una actualización
-const VERSION = 'v3';
+// Cambia esta fecha cada vez que publiques una actualización (formato YYYY-MM-DD)
+const VERSION = '2026-05-01';
 const CACHE = 'panini-wc26-' + VERSION;
 
 self.addEventListener('install', e => {
