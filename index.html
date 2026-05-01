@@ -264,14 +264,14 @@
 </header>
 
 <div class="tabs">
-  <button class="tab-btn active" id="tab-checklist" onclick="switchTab('checklist')">Tengo / Faltan</button>
+  <button class="tab-btn active" id="tab-checklist" onclick="switchTab('checklist')">Progreso</button>
   <button class="tab-btn" id="tab-qty" onclick="switchTab('qty')">Cantidad</button>
-  <button class="tab-btn" id="tab-trade" onclick="switchTab('trade')">Intercambios</button>
+  <button class="tab-btn" id="tab-trade" onclick="switchTab('trade')">Para cambiar</button>
 </div>
 
 <div class="search-bar" id="searchBar">
   <div class="search-inner">
-    <input class="search-input" type="search" placeholder="Buscar país o estampa..." id="searchInput" oninput="filterSections()">
+    <input class="search-input" type="search" placeholder="Buscar..." id="searchInput" oninput="filterSections()">
     <button class="filter-btn" id="filterBtn" onclick="toggleFilter()">Faltantes</button>
   </div>
 </div>
@@ -552,9 +552,6 @@ function buildTradeView() {
   view.appendChild(shareDiv);
 }
 
-function toggleCard(code) {
-  document.getElementById('card-' + code).classList.toggle('open');
-}
 
 // --- TAB LOGIC ---
 function switchTab(tab) {
@@ -612,13 +609,27 @@ function applyGridMode(isQty) {
 
 function toggleCard(code) {
   const card = document.getElementById('card-' + code);
-  card.classList.toggle('open');
-  const isQty = currentTab === 'qty';
   const isOpen = card.classList.contains('open');
-  const checkGrid = document.getElementById('grid-' + code);
-  const qGrid = document.getElementById('qgrid-' + code);
-  if (checkGrid) checkGrid.style.display = (isOpen && !isQty) ? 'grid' : 'none';
-  if (qGrid) qGrid.style.display = (isOpen && isQty) ? 'grid' : 'none';
+
+  // Close all open cards first
+  document.querySelectorAll('.section-card.open').forEach(c => {
+    const c_code = c.id.replace('card-','');
+    c.classList.remove('open');
+    const cg = document.getElementById('grid-' + c_code);
+    const qg = document.getElementById('qgrid-' + c_code);
+    if (cg) cg.style.display = 'none';
+    if (qg) qg.style.display = 'none';
+  });
+
+  // If it wasn't open before, open it now
+  if (!isOpen) {
+    card.classList.add('open');
+    const isQty = currentTab === 'qty';
+    const checkGrid = document.getElementById('grid-' + code);
+    const qGrid = document.getElementById('qgrid-' + code);
+    if (checkGrid) checkGrid.style.display = isQty ? 'none' : 'grid';
+    if (qGrid) qGrid.style.display = isQty ? 'grid' : 'none';
+  }
 }
 
 // --- FILTER ---
@@ -645,6 +656,17 @@ function applyFilter() {
     if (filterMissing) show = show && ownedCount(sec.code) < sec.stickers.length;
     card.classList.toggle('hidden', !show);
     if (show) visible++;
+
+    // Show/hide individual sticker buttons based on filter
+    sec.stickers.forEach(s => {
+      const btn = document.getElementById('btn-' + s);
+      if (!btn) return;
+      if (filterMissing) {
+        btn.style.display = hasOne(s) ? 'none' : '';
+      } else {
+        btn.style.display = '';
+      }
+    });
   });
   document.getElementById('emptyState').classList.toggle('show', visible === 0);
 }
