@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Panini WC26">
+<meta name="theme-color" content="#0a1628">
+<title>Panini FIFA WC 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a1628;
+    --surface: #111e35;
+    --surface2: #172440;
+    --accent: #f5c518;
+    --accent2: #e8832a;
+    --text: #eef2ff;
+    --text-muted: #7a8db3;
+    --done-bg: #0d2b1a;
+    --done-text: #4ade80;
+    --repeat-bg: #1a1a0d;
+    --repeat-text: #facc15;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+
+  /* HEADER */
+  header {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--bg); padding: 12px 16px 10px;
+    border-bottom: 1px solid rgba(245,197,24,0.15);
+  }
+  .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .logo { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1.5px; color: var(--accent); line-height: 1; }
+  .logo span { color: var(--text-muted); font-size: 13px; display: block; font-family: 'DM Sans', sans-serif; font-weight: 500; letter-spacing: 0; }
+  .header-btns { display: flex; gap: 8px; }
+  .hdr-btn {
+    background: transparent; border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text-muted); padding: 6px 12px; border-radius: 20px;
+    font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif;
+  }
+  .hdr-btn:active { opacity: 0.7; }
+  .hdr-btn.trade-active { background: var(--repeat-text); color: var(--bg); border-color: var(--repeat-text); font-weight: 700; }
+
+  .progress-track { flex: 1; height: 6px; background: var(--surface2); border-radius: 10px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 10px; transition: width 0.4s ease; }
+  .global-progress { display: flex; align-items: center; gap: 10px; }
+  .progress-label { font-size: 12px; font-weight: 600; color: var(--accent); white-space: nowrap; min-width: 70px; text-align: right; }
+
+  /* TABS */
+  .tabs { display: flex; gap: 6px; padding: 10px 16px 0; background: var(--bg); position: sticky; top: 87px; z-index: 98; }
+  .tab-btn {
+    padding: 7px 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);
+    background: transparent; color: var(--text-muted); font-size: 13px; font-weight: 500;
+    cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+  }
+  .tab-btn.active { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 700; }
+
+  /* SEARCH */
+  .search-bar { padding: 10px 16px; position: sticky; top: 131px; z-index: 97; background: var(--bg); }
+  .search-inner { display: flex; gap: 8px; }
+  .search-input {
+    flex: 1; background: var(--surface); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px; padding: 9px 14px; color: var(--text); font-size: 14px;
+    font-family: 'DM Sans', sans-serif; outline: none;
+  }
+  .search-input::placeholder { color: var(--text-muted); }
+  .filter-btn {
+    background: var(--surface); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px; padding: 9px 14px; color: var(--text-muted);
+    font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap;
+  }
+  .filter-btn.active { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 600; }
+
+  main { padding: 12px 16px 80px; display: flex; flex-direction: column; gap: 12px; }
+
+  /* SECTION CARD */
+  .section-card {
+    background: var(--surface); border-radius: var(--radius);
+    overflow: hidden; border: 1px solid rgba(255,255,255,0.06);
+  }
+  .section-card.hidden { display: none; }
+  .section-header {
+    display: flex; align-items: center; padding: 12px 14px;
+    cursor: pointer; user-select: none; gap: 10px; position: relative;
+  }
+  .section-header::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 4px; background: var(--strip-color, var(--accent)); border-radius: 0 2px 2px 0;
+  }
+  .section-flag { width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .section-name { flex: 1; font-weight: 600; font-size: 14px; }
+  .section-code { font-size: 11px; color: var(--text-muted); font-weight: 400; }
+  .section-counter { font-size: 12px; font-weight: 600; color: var(--text-muted); text-align: right; }
+  .section-counter.complete { color: var(--done-text); }
+  .section-mini-bar { width: 40px; height: 3px; background: var(--surface2); border-radius: 2px; overflow: hidden; margin-top: 3px; margin-left: auto; }
+  .section-mini-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 0.3s; }
+  .section-mini-fill.complete { background: var(--done-text); }
+  .chevron { color: var(--text-muted); font-size: 14px; transition: transform 0.25s; flex-shrink: 0; }
+  .section-card.open .chevron { transform: rotate(180deg); }
+
+  /* COMPLETE BADGE */
+  .complete-badge {
+    display: none; background: var(--done-bg);
+    border: 1px solid rgba(74,222,128,0.25); color: var(--done-text);
+    font-size: 11px; font-weight: 600; padding: 4px 10px;
+    border-radius: 20px; margin: 0 14px 12px; text-align: center;
+  }
+  .section-card.complete-section .complete-badge { display: block; }
+
+  /* STICKER GRID — CHECKLIST MODE */
+  .stickers-grid {
+    display: none; padding: 4px 14px 14px;
+    gap: 6px; grid-template-columns: repeat(4, 1fr);
+  }
+  .section-card.open .stickers-grid { display: grid; }
+
+  /* STICKER BUTTON — CHECKLIST */
+  .sticker-btn {
+    background: var(--surface2); border: 1.5px solid rgba(255,255,255,0.07);
+    border-radius: var(--radius-sm); padding: 8px 4px; text-align: center;
+    cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 11.5px; font-weight: 500;
+    color: var(--text-muted); transition: all 0.15s; position: relative;
+    min-height: 44px; display: flex; align-items: center; justify-content: center;
+  }
+  .sticker-btn:active { transform: scale(0.93); }
+  .sticker-btn.owned {
+    background: var(--done-bg); border-color: rgba(74,222,128,0.3);
+    color: var(--done-text); font-weight: 600;
+  }
+  .sticker-btn.owned::after { content: '✓'; position: absolute; top: 3px; right: 5px; font-size: 9px; opacity: 0.7; }
+
+  /* ── QUANTITY STEPPER GRID ── */
+  .qty-grid {
+    display: none; padding: 4px 14px 14px;
+    gap: 6px; grid-template-columns: repeat(3, 1fr);
+  }
+  .section-card.open .qty-grid { display: grid; }
+
+  .qty-item {
+    background: var(--surface2); border: 1.5px solid rgba(255,255,255,0.07);
+    border-radius: var(--radius-sm); overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .qty-label {
+    font-size: 10.5px; font-weight: 600; color: var(--text-muted);
+    text-align: center; padding: 5px 2px 2px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .qty-label.has-one { color: var(--done-text); }
+  .qty-label.has-repeat { color: var(--repeat-text); }
+
+  .qty-controls { display: flex; align-items: center; }
+  .qty-dec, .qty-inc {
+    flex: 0 0 28px; height: 32px; background: transparent;
+    border: none; color: var(--text-muted); font-size: 18px; font-weight: 300;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .qty-dec:active, .qty-inc:active { opacity: 0.5; }
+  .qty-val {
+    flex: 1; text-align: center; font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px; line-height: 32px;
+    color: var(--text-muted);
+  }
+  .qty-val.has-one { color: var(--done-text); }
+  .qty-val.has-repeat { color: var(--repeat-text); }
+
+  /* ── TRADE VIEW ── */
+  #tradeView { padding: 12px 16px 80px; display: none; flex-direction: column; gap: 16px; }
+  #tradeView.visible { display: flex; }
+  .trade-empty { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+  .trade-empty .icon { font-size: 40px; margin-bottom: 12px; }
+
+  .trade-section { background: var(--surface); border-radius: var(--radius); overflow: hidden; border: 1px solid rgba(255,255,255,0.06); }
+  .trade-section-hdr {
+    display: flex; align-items: center; gap: 8px; padding: 10px 14px;
+    background: var(--surface2); position: relative;
+  }
+  .trade-section-hdr::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--strip-color, var(--accent)); }
+  .trade-section-name { flex: 1; font-weight: 600; font-size: 13px; }
+  .trade-badges { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 14px 12px; }
+  .trade-badge {
+    background: var(--repeat-bg); border: 1px solid rgba(250,204,21,0.3);
+    color: var(--repeat-text); border-radius: 6px;
+    padding: 4px 10px; font-size: 12px; font-weight: 600;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .trade-badge .x { font-size: 10px; opacity: 0.7; }
+
+  /* BOTTOM STATS */
+  .stats-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--surface); border-top: 1px solid rgba(255,255,255,0.08);
+    padding: 10px 20px; display: flex; justify-content: space-around; align-items: center; z-index: 100;
+  }
+  .stat-item { text-align: center; }
+  .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--accent); line-height: 1; }
+  .stat-label { font-size: 10px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-divider { width: 1px; height: 30px; background: rgba(255,255,255,0.08); }
+
+  .toast {
+    position: fixed; bottom: 80px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--accent); color: var(--bg); font-weight: 700;
+    font-size: 13px; padding: 8px 20px; border-radius: 20px;
+    opacity: 0; transition: all 0.3s; pointer-events: none; white-space: nowrap; z-index: 200;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 300; display: none; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay.show { display: flex; }
+  .modal { background: var(--surface); border-radius: 16px; padding: 24px; width: 100%; max-width: 320px; border: 1px solid rgba(255,255,255,0.1); }
+  .modal h3 { font-size: 18px; margin-bottom: 8px; }
+  .modal p { color: var(--text-muted); font-size: 14px; margin-bottom: 20px; }
+  .modal-btns { display: flex; gap: 10px; }
+  .modal-btn { flex: 1; padding: 11px; border-radius: 10px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .modal-btn.cancel { background: var(--surface2); color: var(--text); }
+  .modal-btn.confirm { background: #ef4444; color: white; }
+
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); display: none; }
+  .empty-state.show { display: block; }
+  .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="logo">Panini WC 2026<span>⚽ FIFA World Cup</span></div>
+    <div class="header-btns">
+      <button class="hdr-btn" onclick="showReset()">Reiniciar</button>
+    </div>
+  </div>
+  <div class="global-progress">
+    <div class="progress-track"><div class="progress-fill" id="globalFill" style="width:0%"></div></div>
+    <div class="progress-label" id="globalLabel">0 / 0</div>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" id="tab-checklist" onclick="switchTab('checklist')">Tengo / Faltan</button>
+  <button class="tab-btn" id="tab-qty" onclick="switchTab('qty')">Cantidad</button>
+  <button class="tab-btn" id="tab-trade" onclick="switchTab('trade')">Intercambios</button>
+</div>
+
+<div class="search-bar" id="searchBar">
+  <div class="search-inner">
+    <input class="search-input" type="search" placeholder="Buscar país o estampa..." id="searchInput" oninput="filterSections()">
+    <button class="filter-btn" id="filterBtn" onclick="toggleFilter()">Faltantes</button>
+  </div>
+</div>
+
+<main id="mainContent"></main>
+<div class="empty-state" id="emptyState"><div class="icon">🔍</div><p>Sin resultados</p></div>
+<div id="tradeView"><div class="trade-empty"><div class="icon">🔄</div><p>Aquí aparecerán las estampas que tienes de más para intercambiar.</p></div></div>
+
+<div class="stats-bar">
+  <div class="stat-item"><div class="stat-num" id="statOwned">0</div><div class="stat-label">Tengo</div></div>
+  <div class="stat-divider"></div>
+  <div class="stat-item"><div class="stat-num" id="statMissing">0</div><div class="stat-label">Faltan</div></div>
+  <div class="stat-divider"></div>
+  <div class="stat-item"><div class="stat-num" id="statTrade">0</div><div class="stat-label">Repetidas</div></div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="modal-overlay" id="resetModal">
+  <div class="modal">
+    <h3>¿Reiniciar todo?</h3>
+    <p>Se borrarán todas las estampas marcadas. Esta acción no se puede deshacer.</p>
+    <div class="modal-btns">
+      <button class="modal-btn cancel" onclick="hideReset()">Cancelar</button>
+      <button class="modal-btn confirm" onclick="confirmReset()">Borrar todo</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function gen(code, n) {
+  return Array.from({length:n}, (_,i) => `${code}-${i+1}`);
+}
+function genSpecial(code, start, end) {
+  return Array.from({length: end - start + 1}, (_,i) => `${code}-${start + i}`);
+}
+
+const SECTIONS = [
+  { code:"P00", name:"Panini",              stickers: ["P-00"],     color:"#f5c518", emoji:"✨", special: true },
+  { code:"FWC", name:"FWC Special",        stickers: genSpecial("FWC",1,19), color:"#f5c518", emoji:"🏆" },
+  { code:"MEX", name:"México",              stickers:gen("MEX",20), color:"#006847", emoji:"🇲🇽" },
+  { code:"RSA", name:"Sudáfrica",           stickers:gen("RSA",20), color:"#007A4D", emoji:"🇿🇦" },
+  { code:"KOR", name:"Corea del Sur",       stickers:gen("KOR",20), color:"#CD2E3A", emoji:"🇰🇷" },
+  { code:"CZE", name:"Rep. Checa",          stickers:gen("CZE",20), color:"#D7141A", emoji:"🇨🇿" },
+  { code:"CAN", name:"Canadá",              stickers:gen("CAN",20), color:"#FF0000", emoji:"🇨🇦" },
+  { code:"BIH", name:"Bosnia y Herz.",      stickers:gen("BIH",20), color:"#002395", emoji:"🇧🇦" },
+  { code:"QAT", name:"Qatar",               stickers:gen("QAT",20), color:"#8D1B3D", emoji:"🇶🇦" },
+  { code:"SUI", name:"Suiza",               stickers:gen("SUI",20), color:"#FF0000", emoji:"🇨🇭" },
+  { code:"BRA", name:"Brasil",              stickers:gen("BRA",20), color:"#009C3B", emoji:"🇧🇷" },
+  { code:"MAR", name:"Marruecos",           stickers:gen("MAR",20), color:"#C1272D", emoji:"🇲🇦" },
+  { code:"HAI", name:"Haití",               stickers:gen("HAI",20), color:"#00209F", emoji:"🇭🇹" },
+  { code:"SCO", name:"Escocia",             stickers:gen("SCO",20), color:"#003078", emoji:"🏴󠁧󠁢󠁳󠁣󠁴󠁿" },
+  { code:"USA", name:"Estados Unidos",      stickers:gen("USA",20), color:"#002868", emoji:"🇺🇸" },
+  { code:"PAR", name:"Paraguay",            stickers:gen("PAR",20), color:"#D52B1E", emoji:"🇵🇾" },
+  { code:"AUS", name:"Australia",           stickers:gen("AUS",20), color:"#00843D", emoji:"🇦🇺" },
+  { code:"TUR", name:"Turquía",             stickers:gen("TUR",20), color:"#E30A17", emoji:"🇹🇷" },
+  { code:"GER", name:"Alemania",            stickers:gen("GER",20), color:"#444444", emoji:"🇩🇪" },
+  { code:"CUW", name:"Curaçao",             stickers:gen("CUW",20), color:"#002B7F", emoji:"🇨🇼" },
+  { code:"CIV", name:"Costa de Marfil",     stickers:gen("CIV",20), color:"#F77F00", emoji:"🇨🇮" },
+  { code:"ECU", name:"Ecuador",             stickers:gen("ECU",20), color:"#FFD100", emoji:"🇪🇨" },
+  { code:"NED", name:"Países Bajos",        stickers:gen("NED",20), color:"#FF6600", emoji:"🇳🇱" },
+  { code:"JPN", name:"Japón",               stickers:gen("JPN",20), color:"#BC002D", emoji:"🇯🇵" },
+  { code:"SWE", name:"Suecia",              stickers:gen("SWE",20), color:"#006AA7", emoji:"🇸🇪" },
+  { code:"TUN", name:"Túnez",               stickers:gen("TUN",20), color:"#E70013", emoji:"🇹🇳" },
+  { code:"CC",  name:"CC Special",          stickers: genSpecial("CC",1,14), color:"#2E7D32", emoji:"⭐" },
+  { code:"BEL", name:"Bélgica",             stickers:gen("BEL",20), color:"#EF2B2D", emoji:"🇧🇪" },
+  { code:"EGY", name:"Egipto",              stickers:gen("EGY",20), color:"#CE1126", emoji:"🇪🇬" },
+  { code:"IRN", name:"Irán",                stickers:gen("IRN",20), color:"#239F40", emoji:"🇮🇷" },
+  { code:"NZL", name:"Nueva Zelanda",       stickers:gen("NZL",20), color:"#00247D", emoji:"🇳🇿" },
+  { code:"ESP", name:"España",              stickers:gen("ESP",20), color:"#AA151B", emoji:"🇪🇸" },
+  { code:"CPV", name:"Cabo Verde",          stickers:gen("CPV",20), color:"#003893", emoji:"🇨🇻" },
+  { code:"KSA", name:"Arabia Saudita",      stickers:gen("KSA",20), color:"#006C35", emoji:"🇸🇦" },
+  { code:"URU", name:"Uruguay",             stickers:gen("URU",20), color:"#5EB6E4", emoji:"🇺🇾" },
+  { code:"FRA", name:"Francia",             stickers:gen("FRA",20), color:"#002395", emoji:"🇫🇷" },
+  { code:"SEN", name:"Senegal",             stickers:gen("SEN",20), color:"#00853F", emoji:"🇸🇳" },
+  { code:"IRQ", name:"Irak",                stickers:gen("IRQ",20), color:"#007A3D", emoji:"🇮🇶" },
+  { code:"NOR", name:"Noruega",             stickers:gen("NOR",20), color:"#EF2B2D", emoji:"🇳🇴" },
+  { code:"ARG", name:"Argentina",           stickers:gen("ARG",20), color:"#74ACDF", emoji:"🇦🇷" },
+  { code:"ALG", name:"Argelia",             stickers:gen("ALG",20), color:"#006233", emoji:"🇩🇿" },
+  { code:"AUT", name:"Austria",             stickers:gen("AUT",20), color:"#ED2939", emoji:"🇦🇹" },
+  { code:"JOR", name:"Jordania",            stickers:gen("JOR",20), color:"#007A3D", emoji:"🇯🇴" },
+  { code:"POR", name:"Portugal",            stickers:gen("POR",20), color:"#006600", emoji:"🇵🇹" },
+  { code:"COD", name:"R.D. del Congo",      stickers:gen("COD",20), color:"#007FFF", emoji:"🇨🇩" },
+  { code:"UZB", name:"Uzbekistán",          stickers:gen("UZB",20), color:"#1EB53A", emoji:"🇺🇿" },
+  { code:"COL", name:"Colombia",            stickers:gen("COL",20), color:"#FCD116", emoji:"🇨🇴" },
+  { code:"ENG", name:"Inglaterra",          stickers:gen("ENG",20), color:"#CF081F", emoji:"🏴󠁧󠁢󠁥󠁮󠁧󠁿" },
+  { code:"CRO", name:"Croacia",             stickers:gen("CRO",20), color:"#FF0000", emoji:"🇭🇷" },
+  { code:"GHA", name:"Ghana",               stickers:gen("GHA",20), color:"#006B3F", emoji:"🇬🇭" },
+  { code:"PAN", name:"Panamá",              stickers:gen("PAN",20), color:"#005F8E", emoji:"🇵🇦" },
+];
+
+const TOTAL = SECTIONS.reduce((s,sec) => s + sec.stickers.length, 0);
+
+// State: qty[sticker] = 0,1,2,3...  (0 = don't have it)
+let qty = {};
+let filterMissing = false;
+let currentTab = 'checklist';
+
+function loadState() { try { qty = JSON.parse(localStorage.getItem('panini_wc26_v2') || '{}'); } catch { qty = {}; } }
+function saveState() { localStorage.setItem('panini_wc26_v2', JSON.stringify(qty)); }
+
+function getQty(s) { return qty[s] || 0; }
+function hasOne(s) { return getQty(s) >= 1; }
+function isRepeat(s) { return getQty(s) >= 2; }
+
+// Checklist tab: just toggle 0/1
+function toggleSticker(sticker, code) {
+  qty[sticker] = hasOne(sticker) ? 0 : 1;
+  saveState();
+  const btn = document.getElementById('btn-' + sticker);
+  if (btn) btn.className = 'sticker-btn' + (hasOne(sticker) ? ' owned' : '');
+  updateAll();
+  const sec = SECTIONS.find(s=>s.code===code);
+  if (hasOne(sticker) && ownedCount(code) === sec.stickers.length) showToast('🎉 ' + sec.name + ' completa!');
+}
+
+// Quantity tab: inc/dec
+function changeQty(sticker, delta) {
+  const cur = getQty(sticker);
+  const nxt = Math.max(0, cur + delta);
+  qty[sticker] = nxt;
+  saveState();
+  updateQtyItem(sticker);
+  updateAll();
+}
+
+function updateQtyItem(sticker) {
+  const val = getQty(sticker);
+  const valEl = document.getElementById('qv-' + sticker);
+  const lblEl = document.getElementById('ql-' + sticker);
+  if (!valEl) return;
+  valEl.textContent = val;
+  valEl.className = 'qty-val' + (val >= 2 ? ' has-repeat' : val === 1 ? ' has-one' : '');
+  if (lblEl) lblEl.className = 'qty-label' + (val >= 2 ? ' has-repeat' : val === 1 ? ' has-one' : '');
+}
+
+function ownedCount(code) {
+  return SECTIONS.find(s=>s.code===code).stickers.filter(s=>hasOne(s)).length;
+}
+function repeatCount(code) {
+  return SECTIONS.find(s=>s.code===code).stickers.filter(s=>isRepeat(s)).length;
+}
+
+function buildUI() {
+  const main = document.getElementById('mainContent');
+  main.innerHTML = '';
+
+  SECTIONS.forEach(sec => {
+    const total = sec.stickers.length;
+    const card = document.createElement('div');
+    card.className = 'section-card';
+    card.id = 'card-' + sec.code;
+    card.style.setProperty('--strip-color', sec.color);
+
+    // Checklist stickers
+    const checklistGrid = sec.stickers.map(s =>
+      `<button class="sticker-btn" id="btn-${s}" onclick="toggleSticker('${s}','${sec.code}')">${s}</button>`
+    ).join('');
+
+    // Qty steppers (3 per row)
+    const qtyGrid = sec.stickers.map(s =>
+      `<div class="qty-item">
+        <div class="qty-label" id="ql-${s}">${s}</div>
+        <div class="qty-controls">
+          <button class="qty-dec" onclick="changeQty('${s}',-1)">−</button>
+          <div class="qty-val" id="qv-${s}">0</div>
+          <button class="qty-inc" onclick="changeQty('${s}',1)">+</button>
+        </div>
+      </div>`
+    ).join('');
+
+    card.innerHTML = `
+      <div class="section-header" onclick="toggleCard('${sec.code}')">
+        <div class="section-flag">${sec.emoji}</div>
+        <div class="section-name">${sec.name} <span class="section-code">${sec.code}</span></div>
+        <div>
+          <div class="section-counter" id="counter-${sec.code}">0/${total}</div>
+          <div class="section-mini-bar"><div class="section-mini-fill" id="minibar-${sec.code}" style="width:0%"></div></div>
+        </div>
+        <div class="chevron">▾</div>
+      </div>
+      <div class="complete-badge">✦ ¡Sección completa!</div>
+      <div class="stickers-grid checklist-mode" id="grid-${sec.code}">${checklistGrid}</div>
+      <div class="qty-grid qty-mode" id="qgrid-${sec.code}" style="display:none">${qtyGrid}</div>
+    `;
+    main.appendChild(card);
+  });
+
+  updateAll();
+}
+
+function updateAll() {
+  let totalOwned = 0, totalMissing = 0, totalTrade = 0, completedSections = 0;
+
+  SECTIONS.forEach(sec => {
+    const cnt = ownedCount(sec.code);
+    const tot = sec.stickers.length;
+    const pct = tot > 0 ? (cnt/tot*100) : 0;
+    totalOwned += cnt;
+    totalMissing += tot - cnt;
+    const rpt = sec.stickers.filter(s => getQty(s) >= 2).reduce((a,s) => a + getQty(s) - 1, 0);
+    totalTrade += rpt;
+    if (cnt === tot) completedSections++;
+
+    const counter = document.getElementById('counter-' + sec.code);
+    const minibar = document.getElementById('minibar-' + sec.code);
+    const card = document.getElementById('card-' + sec.code);
+
+    if (counter) { counter.textContent = `${cnt}/${tot}`; counter.className = 'section-counter' + (cnt===tot?' complete':''); }
+    if (minibar) { minibar.style.width = pct + '%'; minibar.className = 'section-mini-fill' + (cnt===tot?' complete':''); }
+    if (card) card.classList.toggle('complete-section', cnt===tot);
+
+    // sync checklist buttons
+    sec.stickers.forEach(s => {
+      const btn = document.getElementById('btn-' + s);
+      if (btn) btn.className = 'sticker-btn' + (hasOne(s) ? ' owned' : '');
+      updateQtyItem(s);
+    });
+  });
+
+  const pct = TOTAL > 0 ? (totalOwned/TOTAL*100) : 0;
+  document.getElementById('globalFill').style.width = pct + '%';
+  document.getElementById('globalLabel').textContent = `${totalOwned} / ${TOTAL}`;
+  document.getElementById('statOwned').textContent = totalOwned;
+  document.getElementById('statMissing').textContent = totalMissing;
+  document.getElementById('statTrade').textContent = totalTrade;
+
+  if (currentTab === 'trade') buildTradeView();
+}
+
+function buildTradeView() {
+  const view = document.getElementById('tradeView');
+  view.innerHTML = '';
+  let hasAny = false;
+
+  SECTIONS.forEach(sec => {
+    const repeats = sec.stickers.filter(s => getQty(s) >= 2);
+    if (!repeats.length) return;
+    hasAny = true;
+
+    const div = document.createElement('div');
+    div.className = 'trade-section';
+    div.style.setProperty('--strip-color', sec.color);
+
+    const badges = repeats.map(s => {
+      const extra = getQty(s) - 1;
+      return `<div class="trade-badge">${s} <span class="x">×${extra}</span></div>`;
+    }).join('');
+
+    div.innerHTML = `
+      <div class="trade-section-hdr">
+        <span>${sec.emoji}</span>
+        <div class="trade-section-name">${sec.name}</div>
+      </div>
+      <div class="trade-badges">${badges}</div>
+    `;
+    view.appendChild(div);
+  });
+
+  if (!hasAny) {
+    view.innerHTML = `<div class="trade-empty"><div class="icon">🔄</div><p>Aquí aparecerán las estampas que tienes de más para intercambiar.</p></div>`;
+  }
+}
+
+function toggleCard(code) {
+  document.getElementById('card-' + code).classList.toggle('open');
+}
+
+// --- TAB LOGIC ---
+function switchTab(tab) {
+  currentTab = tab;
+  ['checklist','qty','trade'].forEach(t => {
+    document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+  });
+
+  const main = document.getElementById('mainContent');
+  const tradeView = document.getElementById('tradeView');
+  const searchBar = document.getElementById('searchBar');
+  const emptyState = document.getElementById('emptyState');
+
+  if (tab === 'trade') {
+    main.style.display = 'none';
+    tradeView.classList.add('visible');
+    searchBar.style.display = 'none';
+    emptyState.classList.remove('show');
+    buildTradeView();
+    return;
+  }
+
+  tradeView.classList.remove('visible');
+  main.style.display = 'flex';
+  searchBar.style.display = 'block';
+
+  // Toggle which grid is visible per open card
+  const isQty = tab === 'qty';
+  document.querySelectorAll('.stickers-grid').forEach(g => {
+    g.style.display = '';  // let CSS handle via .open
+    g.className = 'stickers-grid checklist-mode' + (isQty ? ' hide-grid' : '');
+  });
+  document.querySelectorAll('.qty-grid').forEach(g => {
+    g.style.display = '';
+    g.className = 'qty-grid qty-mode' + (isQty ? '' : ' hide-grid');
+  });
+
+  // Re-inject CSS rule for open cards
+  applyGridMode(isQty);
+  filterSections();
+}
+
+function applyGridMode(isQty) {
+  // Update all open cards to show correct grid
+  document.querySelectorAll('.section-card').forEach(card => {
+    const code = card.id.replace('card-','');
+    const checkGrid = document.getElementById('grid-' + code);
+    const qGrid = document.getElementById('qgrid-' + code);
+    if (!checkGrid || !qGrid) return;
+    const isOpen = card.classList.contains('open');
+    checkGrid.style.display = (isOpen && !isQty) ? 'grid' : 'none';
+    qGrid.style.display = (isOpen && isQty) ? 'grid' : 'none';
+  });
+}
+
+function toggleCard(code) {
+  const card = document.getElementById('card-' + code);
+  card.classList.toggle('open');
+  const isQty = currentTab === 'qty';
+  const isOpen = card.classList.contains('open');
+  const checkGrid = document.getElementById('grid-' + code);
+  const qGrid = document.getElementById('qgrid-' + code);
+  if (checkGrid) checkGrid.style.display = (isOpen && !isQty) ? 'grid' : 'none';
+  if (qGrid) qGrid.style.display = (isOpen && isQty) ? 'grid' : 'none';
+}
+
+// --- FILTER ---
+let searchTerm = '';
+function filterSections() {
+  searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+  applyFilter();
+}
+function toggleFilter() {
+  filterMissing = !filterMissing;
+  document.getElementById('filterBtn').classList.toggle('active', filterMissing);
+  applyFilter();
+}
+function applyFilter() {
+  let visible = 0;
+  SECTIONS.forEach(sec => {
+    const card = document.getElementById('card-' + sec.code);
+    let show = true;
+    if (searchTerm) {
+      const matchName = sec.name.toLowerCase().includes(searchTerm) || sec.code.toLowerCase().includes(searchTerm);
+      const matchSticker = sec.stickers.some(s => s.toLowerCase().includes(searchTerm));
+      show = matchName || matchSticker;
+    }
+    if (filterMissing) show = show && ownedCount(sec.code) < sec.stickers.length;
+    card.classList.toggle('hidden', !show);
+    if (show) visible++;
+  });
+  document.getElementById('emptyState').classList.toggle('show', visible === 0);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+function showReset() { document.getElementById('resetModal').classList.add('show'); }
+function hideReset() { document.getElementById('resetModal').classList.remove('show'); }
+function confirmReset() {
+  qty = {}; saveState(); updateAll(); hideReset(); showToast('Reiniciado correctamente');
+}
+
+loadState();
+buildUI();
+</script>
+</body>
+</html>
