@@ -177,6 +177,26 @@
   .trade-empty { text-align: center; padding: 60px 20px; color: var(--text-muted); }
   .trade-empty .icon { font-size: 40px; margin-bottom: 12px; }
 
+  .share-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #25D366;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 13px 20px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    width: 100%;
+    transition: opacity 0.2s;
+  }
+  .share-btn:active { opacity: 0.8; }
+  .share-btn svg { flex-shrink: 0; }
+
   .trade-section { background: var(--surface); border-radius: var(--radius); overflow: hidden; border: 1px solid rgba(255,255,255,0.06); }
   .trade-section-hdr {
     display: flex; align-items: center; gap: 8px; padding: 10px 14px;
@@ -485,11 +505,17 @@ function buildTradeView() {
   const view = document.getElementById('tradeView');
   view.innerHTML = '';
   let hasAny = false;
+  let allRepeats = [];
 
   SECTIONS.forEach(sec => {
     const repeats = sec.stickers.filter(s => getQty(s) >= 2);
     if (!repeats.length) return;
     hasAny = true;
+
+    repeats.forEach(s => {
+      const extra = getQty(s) - 1;
+      for (let i = 0; i < extra; i++) allRepeats.push(s);
+    });
 
     const div = document.createElement('div');
     div.className = 'trade-section';
@@ -512,7 +538,18 @@ function buildTradeView() {
 
   if (!hasAny) {
     view.innerHTML = `<div class="trade-empty"><div class="icon">🔄</div><p>Aquí aparecerán las estampas que tienes de más para intercambiar.</p></div>`;
+    return;
   }
+
+  // Share button
+  const shareDiv = document.createElement('div');
+  shareDiv.innerHTML = `
+    <button class="share-btn" onclick="shareRepeats()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.555 4.118 1.528 5.845L0 24l6.335-1.507C8.05 23.453 9.982 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.885 0-3.636-.52-5.127-1.427l-.367-.218-3.761.895.944-3.653-.239-.376A9.953 9.953 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+      Compartir por WhatsApp
+    </button>
+  `;
+  view.appendChild(shareDiv);
 }
 
 function toggleCard(code) {
@@ -622,6 +659,24 @@ function showReset() { document.getElementById('resetModal').classList.add('show
 function hideReset() { document.getElementById('resetModal').classList.remove('show'); }
 function confirmReset() {
   qty = {}; saveState(); updateAll(); hideReset(); showToast('Reiniciado correctamente');
+}
+
+function shareRepeats() {
+  let lines = ['🔄 *Mis repetidas Panini WC 2026*', ''];
+  SECTIONS.forEach(sec => {
+    const repeats = sec.stickers.filter(s => getQty(s) >= 2);
+    if (!repeats.length) return;
+    const items = repeats.map(s => {
+      const extra = getQty(s) - 1;
+      return extra > 1 ? `${s} ×${extra}` : s;
+    }).join(', ');
+    lines.push(`${sec.emoji} *${sec.name}:* ${items}`);
+  });
+  lines.push('');
+  lines.push('¿Cuáles te faltan? 👇');
+  const text = lines.join('\n');
+  const url = 'https://wa.me/?text=' + encodeURIComponent(text);
+  window.open(url, '_blank');
 }
 
 loadState();
