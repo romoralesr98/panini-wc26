@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Panini WC26">
-<meta name="theme-color" content="#0a1628">
+<meta name="theme-color" content="#021a10">
 <title>Panini FIFA WC 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -63,6 +63,7 @@
 
   /* SEARCH */
   .search-bar { padding: 10px 16px; position: sticky; top: 131px; z-index: 97; background: var(--bg); }
+  #shareMissingWrap { position: sticky; top: 183px; z-index: 96; background: var(--bg); }
   .search-inner { display: flex; gap: 8px; }
   .search-input {
     flex: 1; background: var(--surface); border: 1px solid rgba(255,255,255,0.08);
@@ -274,6 +275,12 @@
     <input class="search-input" type="search" placeholder="Buscar..." id="searchInput" oninput="filterSections()">
     <button class="filter-btn" id="filterBtn" onclick="toggleFilter()">Faltantes</button>
   </div>
+</div>
+<div id="shareMissingWrap" style="padding: 0 16px 10px; display:none;">
+  <button class="share-btn" style="background:#25D366;" onclick="shareMissing()">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.555 4.118 1.528 5.845L0 24l6.335-1.507C8.05 23.453 9.982 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.885 0-3.636-.52-5.127-1.427l-.367-.218-3.761.895.944-3.653-.239-.376A9.953 9.953 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+    Compartir estampas faltantes
+  </button>
 </div>
 
 <main id="mainContent"></main>
@@ -498,6 +505,7 @@ function updateAll() {
   document.getElementById('statMissing').textContent = totalMissing;
   document.getElementById('statTrade').textContent = totalTrade;
 
+  updateShareMissingBtn();
   if (currentTab === 'trade') buildTradeView();
 }
 
@@ -570,6 +578,7 @@ function switchTab(tab) {
     tradeView.classList.add('visible');
     searchBar.style.display = 'none';
     emptyState.classList.remove('show');
+    document.getElementById('shareMissingWrap').style.display = 'none';
     buildTradeView();
     return;
   }
@@ -577,6 +586,7 @@ function switchTab(tab) {
   tradeView.classList.remove('visible');
   main.style.display = 'flex';
   searchBar.style.display = 'block';
+  updateShareMissingBtn();
 
   // Toggle which grid is visible per open card
   const isQty = tab === 'qty';
@@ -701,8 +711,51 @@ function shareRepeats() {
   window.open(url, '_blank');
 }
 
+function shareMissing() {
+  let lines = ['📋 *Mis estampas faltantes Panini WC 2026*', ''];
+  let totalMissing = 0;
+  SECTIONS.forEach(sec => {
+    const missing = sec.stickers.filter(s => !hasOne(s));
+    if (!missing.length) return;
+    totalMissing += missing.length;
+    lines.push(`${sec.emoji} *${sec.name}:* ${missing.join(', ')}`);
+  });
+  if (!totalMissing) { showToast('¡No te falta ninguna! 🎉'); return; }
+  lines.push('');
+  lines.push(`Faltan ${totalMissing} en total. ¿Tienes alguna? 👆`);
+  window.open('https://wa.me/?text=' + encodeURIComponent(lines.join('\n')), '_blank');
+}
+
+function updateShareMissingBtn() {
+  const wrap = document.getElementById('shareMissingWrap');
+  if (!wrap) return;
+  const isChecklist = currentTab === 'checklist';
+  const hasMissing = SECTIONS.some(sec => sec.stickers.some(s => !hasOne(s)));
+  wrap.style.display = (isChecklist && hasMissing) ? 'block' : 'none';
+}
+
 loadState();
 buildUI();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').then(reg => {
+    // Check for updates every time the app opens
+    reg.update();
+    reg.addEventListener('updatefound', () => {
+      const newSW = reg.installing;
+      newSW.addEventListener('statechange', () => {
+        if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+          // New version ready — reload automatically
+          newSW.postMessage({ action: 'skipWaiting' });
+        }
+      });
+    });
+  });
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    window.location.reload();
+  });
+}
 </script>
 </body>
 </html>
